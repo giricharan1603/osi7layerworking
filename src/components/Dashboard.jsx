@@ -4,6 +4,9 @@ import ProtocolPanels from './ProtocolPanels';
 import { encryptData, decryptData } from '../utils/crypto';
 import { applyFraming, stripFraming } from '../utils/framing';
 import { findShortestPath, generateBroadcastTree } from '../utils/routing';
+import bannerLogo from '../assets/kgc-banner.png';
+import brandLogo from '../assets/kgc-brand-logo.png';
+import brandFavicon from '../assets/kgc-favicon.jpg';
 
 const DEFAULT_GRAPH = {
   A: { B: 4, C: 2 }, 
@@ -17,6 +20,27 @@ const DEFAULT_GRAPH = {
 const BASE_SPEED = 0.015;
 
 export default function Dashboard() {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kgc_theme');
+      return saved ? saved === 'dark' : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('kgc_theme', next ? 'dark' : 'light');
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
   const [inputText, setInputText] = useState("HELLO LAB");
   const [encrypted, setEncrypted] = useState("");
   const [framingType, setFramingType] = useState("charCount");
@@ -283,30 +307,102 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#121212', color: '#e0e0e0', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      background: isDarkMode ? '#121212' : '#f4f6f9',
+      color: isDarkMode ? '#e0e0e0' : '#1e293b',
+      fontFamily: 'Segoe UI, sans-serif',
+      overflow: 'hidden',
+      transition: 'background 0.25s ease, color 0.25s ease'
+    }}>
       
-      {/* Left Configuration Control Hub Panel */}
-      <div style={{ width: '330px', padding: '16px', borderRight: '1px solid #2d2d2d', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-        <h3 style={{ margin: '0 0 16px 0', color: '#ffc107', fontSize: '18px' }}>NetForge Protocol Suite</h3>
+      {/* Main Workspace (Left Hub + Canvas & Panels) */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+
+        {/* Left Configuration Control Hub Panel */}
+        {/* Left Configuration Control Hub Panel */}
+        <div 
+          className="no-scrollbar"
+          style={{
+            width: '320px',
+            padding: '12px 14px',
+            borderRight: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+            display: 'flex',
+            flexDirection: 'column',
+            boxSizing: 'border-box',
+            overflowY: 'auto',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            background: isDarkMode ? '#16181d' : '#ffffff',
+            color: isDarkMode ? '#e0e0e0' : '#1e293b',
+            transition: 'background 0.25s ease, border-color 0.25s ease'
+          }}
+        >
+          
+          {/* Brand Header: KGC OSI - 7 Banner Image at Top */}
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: '8px'
+          }}>
+            <img 
+              src={bannerLogo} 
+              alt="KGC OSI - 7 Network Architecture Suite" 
+              style={{ 
+                width: '100%', 
+                maxHeight: '80px',
+                objectFit: 'contain',
+                borderRadius: '6px', 
+                display: 'block',
+                boxShadow: isDarkMode 
+                  ? '0 0 14px rgba(0, 247, 255, 0.2)' 
+                  : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                transition: 'box-shadow 0.25s ease'
+              }} 
+            />
+          </div>
         
-        <label style={{ fontSize: '12px', fontWeight: 'bold' }}>Message Payload Input:</label>
+        <label style={{ fontSize: '11px', fontWeight: 'bold', color: isDarkMode ? '#e0e0e0' : '#334155' }}>Message Payload Input:</label>
         <input 
           type="text" 
           value={inputText} 
           onChange={(e) => setInputText(e.target.value)}
-          style={{ background: '#1e1e1e', border: '1px solid #444', color: '#fff', padding: '8px', borderRadius: '4px', margin: '4px 0 10px 0' }}
+          style={{
+            background: isDarkMode ? '#1e1e1e' : '#f8fafc',
+            border: isDarkMode ? '1px solid #444' : '1px solid #cbd5e1',
+            color: isDarkMode ? '#fff' : '#0f172a',
+            padding: '5px 8px',
+            borderRadius: '4px',
+            margin: '2px 0 6px 0',
+            fontSize: '11px'
+          }}
         />
 
         {/* Starting and Ending Positions Selector */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <label style={{ flex: 1, fontSize: '11px', color: '#ccc' }}>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+          <label style={{ flex: 1, fontSize: '11px', color: isDarkMode ? '#ccc' : '#475569' }}>
             <span style={{ fontWeight: 'bold', color: '#28a745' }}>
-              {showBroadcast ? "🟢 Root (Source):" : "🟢 Start Node:"}
+              {showBroadcast ? "🟢 Root:" : "🟢 Start:"}
             </span>
             <select 
               value={startNode} 
               onChange={(e) => setStartNode(e.target.value)}
-              style={{ width: '100%', background: '#1e1e1e', color: '#fff', border: '1px solid #444', borderRadius: '4px', padding: '5px', marginTop: '3px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+              style={{
+                width: '100%',
+                background: isDarkMode ? '#1e1e1e' : '#f8fafc',
+                color: isDarkMode ? '#fff' : '#0f172a',
+                border: isDarkMode ? '1px solid #444' : '1px solid #cbd5e1',
+                borderRadius: '4px',
+                padding: '4px',
+                marginTop: '2px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: 'bold'
+              }}
             >
               {['A', 'B', 'C', 'D', 'E', 'F'].map(n => (
                 <option key={n} value={n} disabled={!showBroadcast && n === endNode}>{n}</option>
@@ -314,32 +410,43 @@ export default function Dashboard() {
             </select>
           </label>
 
-          <label style={{ flex: 1, fontSize: '11px', color: '#ccc' }}>
+          <label style={{ flex: 1, fontSize: '11px', color: isDarkMode ? '#ccc' : '#475569' }}>
             <span style={{ fontWeight: 'bold', color: showBroadcast ? '#00f7ff' : '#dc3545' }}>
-              {showBroadcast ? "🌐 Target:" : "🔴 End Node:"}
+              {showBroadcast ? "🌐 Target:" : "🔴 End:"}
             </span>
             {showBroadcast ? (
               <div style={{ 
-                background: '#0c2e35', 
-                border: '1px solid #00f7ff', 
-                color: '#00f7ff', 
+                background: isDarkMode ? '#0c2e35' : '#e0f2fe', 
+                border: isDarkMode ? '1px solid #00f7ff' : '1px solid #0284c7', 
+                color: isDarkMode ? '#00f7ff' : '#0369a1', 
                 borderRadius: '4px', 
-                padding: '5px 4px', 
-                marginTop: '3px', 
-                fontSize: '11px', 
+                padding: '4px', 
+                marginTop: '2px', 
+                fontSize: '10px', 
                 fontWeight: 'bold',
                 textAlign: 'center',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
               }}>
-                All Nodes (Broadcast)
+                All Nodes
               </div>
             ) : (
               <select 
                 value={endNode} 
                 onChange={(e) => setEndNode(e.target.value)}
-                style={{ width: '100%', background: '#1e1e1e', color: '#fff', border: '1px solid #444', borderRadius: '4px', padding: '5px', marginTop: '3px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                style={{
+                  width: '100%',
+                  background: isDarkMode ? '#1e1e1e' : '#f8fafc',
+                  color: isDarkMode ? '#fff' : '#0f172a',
+                  border: isDarkMode ? '1px solid #444' : '1px solid #cbd5e1',
+                  borderRadius: '4px',
+                  padding: '4px',
+                  marginTop: '2px',
+                  cursor: 'pointer',
+                  fontSize: '11px',
+                  fontWeight: 'bold'
+                }}
               >
                 {['A', 'B', 'C', 'D', 'E', 'F'].map(n => (
                   <option key={n} value={n} disabled={n === startNode}>{n}</option>
@@ -361,18 +468,19 @@ export default function Dashboard() {
           updateEdgeWeight={updateEdgeWeight}
           resetGraphWeights={resetGraphWeights}
           shortestPath={shortestPath}
+          isDarkMode={isDarkMode}
         />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
           
           {/* Simple Noise Option Checkbox */}
           <label style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '8px', 
-            background: simulateNoise ? '#381616' : '#1e1e1e', 
-            border: simulateNoise ? '1px solid #dc3545' : '1px solid #333', 
-            padding: '8px 10px', 
+            gap: '6px', 
+            background: simulateNoise ? '#381616' : (isDarkMode ? '#1e1e1e' : '#f1f5f9'), 
+            border: simulateNoise ? '1px solid #dc3545' : (isDarkMode ? '1px solid #333' : '1px solid #cbd5e1'), 
+            padding: '6px 8px', 
             borderRadius: '4px', 
             cursor: 'pointer' 
           }}>
@@ -380,13 +488,13 @@ export default function Dashboard() {
               type="checkbox" 
               checked={simulateNoise} 
               onChange={(e) => setSimulateNoise(e.target.checked)}
-              style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#dc3545' }}
+              style={{ width: '14px', height: '14px', cursor: 'pointer', accentColor: '#dc3545' }}
             />
             <div>
-              <div style={{ fontSize: '12px', fontWeight: 'bold', color: simulateNoise ? '#ff7878' : '#ddd' }}>
+              <div style={{ fontSize: '11px', fontWeight: 'bold', color: simulateNoise ? '#ff7878' : (isDarkMode ? '#ddd' : '#1e293b') }}>
                 ⚡ Simulate Channel Noise
               </div>
-              <div style={{ fontSize: '10px', color: '#888' }}>
+              <div style={{ fontSize: '9px', color: isDarkMode ? '#888' : '#64748b' }}>
                 Injects CRC error to test Go-Back-N manual retransmission
               </div>
             </div>
@@ -398,9 +506,10 @@ export default function Dashboard() {
               background: showBroadcast ? '#00b4d8' : '#28a745', 
               color: '#fff', 
               border: 'none', 
-              padding: '10px', 
+              padding: '8px', 
               borderRadius: '4px', 
               fontWeight: 'bold', 
+              fontSize: '12px',
               cursor: 'pointer' 
             }}
           >
@@ -409,7 +518,7 @@ export default function Dashboard() {
 
           <button 
             onClick={() => handleToggleMode(!showBroadcast)} 
-            style={{ background: '#007bff', color: '#fff', border: 'none', padding: '8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+            style={{ background: '#007bff', color: '#fff', border: 'none', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
           >
             {showBroadcast ? "View Dijkstra Shortest Path" : "Show Subnet Spanning Broadcast Tree"}
           </button>
@@ -420,14 +529,50 @@ export default function Dashboard() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px', gap: '14px', boxSizing: 'border-box', overflowY: 'auto' }}>
         
         {/* Sliding Window Frame Queue Buffer Visualizer Header Row */}
-        <div style={{ background: '#1e1e1e', padding: '12px 16px', borderRadius: '6px', border: '1px solid #2d2d2d' }}>
+        <div style={{
+          background: isDarkMode ? '#1e1e1e' : '#ffffff',
+          padding: '12px 16px',
+          borderRadius: '6px',
+          border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h4 style={{ margin: 0, color: '#ffc107', fontSize: '14px' }}>
+            <h4 style={{ margin: 0, color: isDarkMode ? '#ffc107' : '#b45309', fontSize: '14px' }}>
               Go-Back-N Transmit Sliding Window Ring Buffer (Window Size: {windowSize})
             </h4>
-            <span style={{ fontSize: '11px', color: '#888' }}>
-              Base ACK: <strong style={{ color: '#28a745' }}>{baseAck}</strong> | Next Seq: <strong style={{ color: '#ffc107' }}>{nextSeqNum}</strong>
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <span style={{ fontSize: '11px', color: isDarkMode ? '#888' : '#64748b' }}>
+                Base ACK: <strong style={{ color: '#28a745' }}>{baseAck}</strong> | Next Seq: <strong style={{ color: isDarkMode ? '#ffc107' : '#b45309' }}>{nextSeqNum}</strong>
+              </span>
+
+              {/* Dark Mode Option at Right Side Top Corner */}
+              <button
+                onClick={toggleTheme}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: isDarkMode 
+                    ? 'linear-gradient(135deg, #1f2937, #111827)' 
+                    : 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
+                  color: isDarkMode ? '#00f7ff' : '#0f172a',
+                  border: isDarkMode ? '1px solid #00f7ff66' : '1px solid #94a3b8',
+                  padding: '4px 12px',
+                  borderRadius: '20px',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  boxShadow: isDarkMode 
+                    ? '0 0 10px rgba(0, 247, 255, 0.2)' 
+                    : '0 2px 4px rgba(0, 0, 0, 0.08)',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none'
+                }}
+                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                <span>{isDarkMode ? '🌙 Dark Mode' : '☀️ Light Mode'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Prominent Manual Retransmit Action Banner */}
@@ -508,7 +653,15 @@ export default function Dashboard() {
         </div>
 
         {/* Network Layout Graph Visual Canvas */}
-        <div style={{ flex: 1, minHeight: '340px', background: '#1e1e1e', borderRadius: '6px', overflow: 'hidden', border: '1px solid #2d2d2d' }}>
+        <div style={{
+          flex: 1,
+          minHeight: '340px',
+          background: isDarkMode ? '#1e1e1e' : '#ffffff',
+          borderRadius: '6px',
+          overflow: 'hidden',
+          border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+          boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
+        }}>
           <NetworkCanvas 
             activePackets={activePackets} 
             shortestPath={shortestPath} 
@@ -522,6 +675,7 @@ export default function Dashboard() {
             onSpeedChange={handleSpeedChange}
             startNode={startNode}
             endNode={endNode}
+            isDarkMode={isDarkMode}
           />
         </div>
 
@@ -529,11 +683,19 @@ export default function Dashboard() {
         <div style={{ display: 'flex', gap: '16px', minHeight: '140px' }}>
           
           {/* Receiver Buffer with Manual/Auto Approve controls & Manual Retransmit */}
-          <div style={{ flex: 1, background: '#1e1e1e', padding: '12px 16px', borderRadius: '6px', border: '1px solid #2d2d2d', overflowY: 'auto' }}>
+          <div style={{
+            flex: 1,
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            padding: '12px 16px',
+            borderRadius: '6px',
+            border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+            overflowY: 'auto',
+            boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
+          }}>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h5 style={{ margin: 0, color: showBroadcast ? '#00f7ff' : '#ffc107', fontSize: '13px' }}>
+                <h5 style={{ margin: 0, color: showBroadcast ? (isDarkMode ? '#00f7ff' : '#0284c7') : (isDarkMode ? '#ffc107' : '#b45309'), fontSize: '13px' }}>
                   {showBroadcast 
                     ? `Receiver Buffer (Broadcast Tree: Delivered to Subnet Nodes)` 
                     : `Receiver Sorting Buffer (Destination Node ${endNode})`}
@@ -675,11 +837,21 @@ export default function Dashboard() {
           </div>
           
           {/* Final Decrypted Result Console */}
-          <div style={{ width: '280px', background: '#1e1e1e', padding: '12px 16px', borderRadius: '6px', border: '1px solid #2d2d2d', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ fontSize: '11px', color: '#aaa' }}>
-              Encrypted Ciphertext: <span style={{ color: '#ffc107', fontFamily: 'monospace' }}>{encrypted || "None"}</span>
+          <div style={{
+            width: '280px',
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            padding: '12px 16px',
+            borderRadius: '6px',
+            border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
+          }}>
+            <div style={{ fontSize: '11px', color: isDarkMode ? '#aaa' : '#64748b' }}>
+              Encrypted Ciphertext: <span style={{ color: isDarkMode ? '#ffc107' : '#b45309', fontFamily: 'monospace' }}>{encrypted || "None"}</span>
             </div>
-            <div style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '8px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '8px', color: isDarkMode ? '#e0e0e0' : '#1e293b' }}>
               Final Decrypted Output:
             </div>
             <div style={{ fontSize: '20px', color: '#28a745', fontWeight: 'bold', marginTop: '4px', letterSpacing: '1px' }}>
@@ -690,6 +862,73 @@ export default function Dashboard() {
         </div>
 
       </div>
+
+    </div>
+
+    {/* Official KGC Brand Footer */}
+      <footer style={{
+        background: isDarkMode ? '#15181e' : '#ffffff',
+        borderTop: isDarkMode ? '1px solid #262c37' : '1px solid #e2e8f0',
+        padding: '8px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px',
+        fontSize: '12px',
+        color: isDarkMode ? '#9aa0a6' : '#64748b',
+        zIndex: 20,
+        boxShadow: isDarkMode ? '0 -3px 12px rgba(0, 0, 0, 0.45)' : '0 -2px 8px rgba(0, 0, 0, 0.08)',
+        transition: 'background 0.25s ease, border-color 0.25s ease'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img 
+            src={brandFavicon} 
+            alt="KGC Favicon" 
+            style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1.5px solid #00f7ff' }} 
+          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 'bold', color: '#00f7ff', fontSize: '13px', letterSpacing: '0.6px' }}>
+              KGC  OSI - 7
+            </span>
+            <span style={{ color: '#444' }}>|</span>
+            <span style={{ color: '#b0b8c4', fontSize: '11px' }}>
+              Comprehensive 7-Layer OSI Architecture &amp; Protocol Simulation Platform
+            </span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{
+            background: '#ffffff',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <img 
+              src={brandLogo} 
+              alt="KGC Brand" 
+              style={{ height: '20px', width: 'auto', display: 'block' }} 
+            />
+          </div>
+          <div style={{ color: '#8c94a0', fontSize: '11px' }}>
+            &copy; {new Date().getFullYear()} <strong style={{ color: '#ffffff' }}>KGC</strong> Brand. All rights reserved.
+          </div>
+          <div style={{
+            background: 'rgba(0, 247, 255, 0.1)',
+            border: '1px solid rgba(0, 247, 255, 0.3)',
+            color: '#00f7ff',
+            padding: '2px 8px',
+            borderRadius: '12px',
+            fontSize: '10px',
+            fontWeight: 'bold',
+            letterSpacing: '0.5px'
+          }}>
+            KGC OFFICIAL
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

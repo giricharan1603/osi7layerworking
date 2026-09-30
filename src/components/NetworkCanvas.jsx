@@ -22,7 +22,8 @@ export default function NetworkCanvas({
   speedMultiplier = 1,
   onSpeedChange,
   startNode = 'A',
-  endNode = 'F'
+  endNode = 'F',
+  isDarkMode = true
 }) {
   const canvasRef = useRef(null);
   
@@ -47,9 +48,10 @@ export default function NetworkCanvas({
       startNode,
       endNode,
       onPacketArrival,
-      onPacketCorrupted
+      onPacketCorrupted,
+      isDarkMode
     };
-  }, [shortestPath, broadcastEdges, broadcastLevels, showBroadcast, subnetGraph, speedMultiplier, startNode, endNode, onPacketArrival, onPacketCorrupted]);
+  }, [shortestPath, broadcastEdges, broadcastLevels, showBroadcast, subnetGraph, speedMultiplier, startNode, endNode, onPacketArrival, onPacketCorrupted, isDarkMode]);
 
   // Synchronize incoming packet events from React state without resetting animation progress
   useEffect(() => {
@@ -102,15 +104,16 @@ export default function NetworkCanvas({
         subnetGraph: currentGraph,
         startNode: currentStart,
         endNode: currentEnd,
-        onPacketArrival: handleArrival
+        onPacketArrival: handleArrival,
+        isDarkMode: currentDarkMode
       } = propsRef.current;
 
-      ctx.fillStyle = '#1a1a1a';
+      ctx.fillStyle = currentDarkMode ? '#1a1a1a' : '#f8fafc';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // 1. Draw Default Subnet Links
       ctx.lineWidth = 1.5;
-      ctx.strokeStyle = '#333';
+      ctx.strokeStyle = currentDarkMode ? '#333' : '#cbd5e1';
       const allLinks = [
         ['A','B'], ['A','C'], ['B','C'], ['B','D'], 
         ['C','D'], ['C','E'], ['D','E'], ['D','F'], ['E','F']
@@ -187,13 +190,13 @@ export default function NetworkCanvas({
 
         const badgeW = 20;
         const badgeH = 14;
-        ctx.fillStyle = isOnPath ? '#ffc107' : isOnTree ? '#00f7ff' : '#141414';
-        ctx.strokeStyle = isOnPath ? '#ffea00' : isOnTree ? '#00c4cc' : '#555';
+        ctx.fillStyle = isOnPath ? '#ffc107' : isOnTree ? '#00f7ff' : (currentDarkMode ? '#141414' : '#ffffff');
+        ctx.strokeStyle = isOnPath ? '#ffea00' : isOnTree ? '#00c4cc' : (currentDarkMode ? '#555' : '#cbd5e1');
         ctx.lineWidth = 1;
         ctx.fillRect(midX - badgeW / 2, midY - badgeH / 2, badgeW, badgeH);
         ctx.strokeRect(midX - badgeW / 2, midY - badgeH / 2, badgeW, badgeH);
 
-        ctx.fillStyle = (isOnPath || isOnTree) ? '#000' : '#888';
+        ctx.fillStyle = (isOnPath || isOnTree) ? '#000' : (currentDarkMode ? '#888' : '#334155');
         ctx.font = 'bold 9px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -210,17 +213,17 @@ export default function NetworkCanvas({
         ctx.arc(coords.x, coords.y, 16, 0, 2 * Math.PI);
 
         if (isBroadcast) {
-          ctx.fillStyle = isStart ? '#00f7ff' : '#222';
-          ctx.strokeStyle = isStart ? '#fff' : '#00f7ff';
+          ctx.fillStyle = isStart ? '#00f7ff' : (currentDarkMode ? '#222' : '#ffffff');
+          ctx.strokeStyle = isStart ? (currentDarkMode ? '#fff' : '#0284c7') : '#00f7ff';
         } else {
-          ctx.fillStyle = isStart ? '#1e7e34' : isEnd ? '#bd2130' : isPathNode ? '#ffc107' : '#222';
-          ctx.strokeStyle = isStart ? '#28a745' : isEnd ? '#dc3545' : isPathNode ? '#fff' : '#555';
+          ctx.fillStyle = isStart ? '#1e7e34' : isEnd ? '#bd2130' : isPathNode ? '#ffc107' : (currentDarkMode ? '#222' : '#ffffff');
+          ctx.strokeStyle = isStart ? '#28a745' : isEnd ? '#dc3545' : isPathNode ? '#fff' : (currentDarkMode ? '#555' : '#94a3b8');
         }
         ctx.fill();
         ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        ctx.fillStyle = (!isBroadcast && isPathNode && !isStart && !isEnd) || (isBroadcast && isStart) ? '#000' : '#fff';
+        ctx.fillStyle = (!isBroadcast && isPathNode && !isStart && !isEnd) || (isBroadcast && isStart) ? '#000' : (currentDarkMode || isStart || isEnd ? '#fff' : '#0f172a');
         ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -449,8 +452,8 @@ export default function NetworkCanvas({
         alignItems: 'center', 
         justifyContent: 'space-between', 
         padding: '8px 14px', 
-        background: '#232324', 
-        borderBottom: '1px solid #333', 
+        background: isDarkMode ? '#232324' : '#f8fafc', 
+        borderBottom: isDarkMode ? '1px solid #333' : '1px solid #e2e8f0', 
         fontSize: '11px',
         flexWrap: 'wrap',
         gap: '8px'
@@ -536,7 +539,8 @@ export default function NetworkCanvas({
           position: 'absolute',
           top: '10px',
           left: '12px',
-          background: 'rgba(20, 20, 20, 0.85)',
+          background: isDarkMode ? 'rgba(20, 20, 20, 0.85)' : 'rgba(255, 255, 255, 0.95)',
+          boxShadow: isDarkMode ? 'none' : '0 2px 8px rgba(0,0,0,0.1)',
           padding: '4px 10px',
           borderRadius: '4px',
           fontSize: '11px',
