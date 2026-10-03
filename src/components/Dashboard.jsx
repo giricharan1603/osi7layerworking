@@ -90,6 +90,7 @@ export default function Dashboard() {
   const [receiverBuffer, setReceiverBuffer] = useState([]);
   const [finalOutput, setFinalOutput] = useState("");
   const [legalModal, setLegalModal] = useState({ isOpen: false, type: 'privacy' });
+  const [mobileTab, setMobileTab] = useState('all'); // 'all' | 'controls' | 'canvas' | 'logs'
 
   // Computed shortest path & broadcast tree using useMemo (no cascading renders)
   const shortestPath = useMemo(() => {
@@ -203,6 +204,11 @@ export default function Dashboard() {
     setFrameQueue(generatedFrames);
     setBaseAck(0);
     setNextSeqNum(0);
+
+    // On mobile devices, automatically switch to canvas view so user sees active transmission
+    if (typeof window !== 'undefined' && window.innerWidth <= 900 && mobileTab === 'controls') {
+      setMobileTab('canvas');
+    }
   };
 
   // Called when a packet arrives at Destination Node F
@@ -320,33 +326,78 @@ export default function Dashboard() {
     noiseInjectedRef.current = false;
   };
 
+  const mobileClass = mobileTab === 'controls' 
+    ? 'mobile-hide-canvas mobile-hide-logs' 
+    : mobileTab === 'canvas' 
+      ? 'mobile-hide-controls mobile-hide-logs' 
+      : mobileTab === 'logs' 
+        ? 'mobile-hide-controls mobile-hide-canvas' 
+        : '';
+
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      background: isDarkMode ? '#121212' : '#f4f6f9',
-      color: isDarkMode ? '#e0e0e0' : '#1e293b',
-      fontFamily: 'Segoe UI, sans-serif',
-      overflow: 'hidden',
-      transition: 'background 0.25s ease, color 0.25s ease'
-    }}>
-      
+    <div 
+      className={`dashboard-container ${mobileClass}`}
+      style={{
+        background: isDarkMode ? '#121212' : '#f4f6f9',
+        color: isDarkMode ? '#e0e0e0' : '#1e293b'
+      }}
+    >
+      {/* Mobile Navigation Segmented Tab Bar (Visible on mobile screens <= 900px) */}
+      <div 
+        className="mobile-nav-bar" 
+        style={{
+          padding: '8px 10px',
+          background: isDarkMode ? '#1a1d24' : '#ffffff',
+          borderBottom: isDarkMode ? '1px solid #2d3748' : '1px solid #e2e8f0',
+          gap: '6px',
+          justifyContent: 'center',
+          boxShadow: isDarkMode ? '0 2px 8px rgba(0,0,0,0.4)' : '0 1px 4px rgba(0,0,0,0.06)'
+        }}
+      >
+        {[
+          { id: 'all', label: 'Full View' },
+          { id: 'controls', label: 'Controls' },
+          { id: 'canvas', label: 'Network' },
+          { id: 'logs', label: 'Output' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setMobileTab(tab.id)}
+            style={{
+              flex: 1,
+              padding: '6px 4px',
+              fontSize: '11px',
+              fontWeight: mobileTab === tab.id ? 'bold' : 'normal',
+              background: mobileTab === tab.id 
+                ? (isDarkMode ? '#0c2e35' : '#e0f2fe') 
+                : (isDarkMode ? '#232834' : '#f1f5f9'),
+              color: mobileTab === tab.id 
+                ? (isDarkMode ? '#00f7ff' : '#0284c7') 
+                : (isDarkMode ? '#94a3b8' : '#64748b'),
+              border: mobileTab === tab.id 
+                ? (isDarkMode ? '1px solid #00f7ff' : '1px solid #0284c7') 
+                : (isDarkMode ? '1px solid #334155' : '1px solid #cbd5e1'),
+              borderRadius: '4px',
+              cursor: 'pointer',
+              textAlign: 'center'
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Main Workspace (Left Hub + Canvas & Panels) */}
-      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+      <div className="workspace-layout">
 
         {/* Left Configuration Control Hub Panel */}
-        {/* Left Configuration Control Hub Panel */}
         <div 
-          className="no-scrollbar"
+          className="sidebar-panel no-scrollbar"
           style={{
-            width: '320px',
             padding: '12px 14px',
             borderRight: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
             display: 'flex',
             flexDirection: 'column',
-            boxSizing: 'border-box',
-            overflowY: 'auto',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             background: isDarkMode ? '#16181d' : '#ffffff',
@@ -559,17 +610,20 @@ export default function Dashboard() {
       </div>
 
       {/* Main Graph Canvas and Logging Console Panels Workspace */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px', gap: '14px', boxSizing: 'border-box', overflowY: 'auto' }}>
+      <div className="main-content-panel">
         
-        {/* Sliding Window Frame Queue Buffer Visualizer Header Row */}
-        <div style={{
-          background: isDarkMode ? '#1e1e1e' : '#ffffff',
-          padding: '12px 16px',
-          borderRadius: '6px',
-          border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
-          boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        {/* Canvas Section Group */}
+        <div className="canvas-section-group" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+          {/* Sliding Window Frame Queue Buffer Visualizer Header Row */}
+          <div style={{
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            padding: '12px 16px',
+            borderRadius: '6px',
+            border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+            boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
             <h4 style={{ margin: 0, color: isDarkMode ? '#ffc107' : '#b45309', fontSize: '14px' }}>
               Go-Back-N Transmit Sliding Window Ring Buffer (Window Size: {windowSize})
             </h4>
@@ -687,9 +741,7 @@ export default function Dashboard() {
         </div>
 
         {/* Network Layout Graph Visual Canvas */}
-        <div style={{
-          flex: 1,
-          minHeight: '340px',
+        <div className="canvas-card-wrapper" style={{
           background: isDarkMode ? '#1e1e1e' : '#ffffff',
           borderRadius: '6px',
           overflow: 'hidden',
@@ -713,8 +765,12 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Bottom Destination Stack Frame Assembler Tracker Readout Console Logs */}
-        <div style={{ display: 'flex', gap: '16px', minHeight: '140px' }}>
+        </div>
+
+        {/* Logs Section Group */}
+        <div className="logs-section-group">
+          {/* Bottom Destination Stack Frame Assembler Tracker Readout Console Logs */}
+          <div className="bottom-stack-row">
           
           {/* Receiver Buffer with Manual/Auto Approve controls & Manual Retransmit */}
           <div style={{
@@ -884,17 +940,19 @@ export default function Dashboard() {
           </div>
           
           {/* Final Decrypted Result Console */}
-          <div style={{
-            width: '280px',
-            background: isDarkMode ? '#1e1e1e' : '#ffffff',
-            padding: '12px 16px',
-            borderRadius: '6px',
-            border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
-          }}>
+          <div 
+            className="decrypt-box"
+            style={{
+              background: isDarkMode ? '#1e1e1e' : '#ffffff',
+              padding: '12px 16px',
+              borderRadius: '6px',
+              border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
+            }}
+          >
             <div style={{ fontSize: '11px', color: isDarkMode ? '#aaa' : '#64748b' }}>
               Encrypted Ciphertext: <span style={{ color: isDarkMode ? '#ffc107' : '#b45309', fontFamily: 'monospace' }}>{encrypted || "None"}</span>
             </div>
@@ -909,6 +967,8 @@ export default function Dashboard() {
         </div>
 
       </div>
+
+    </div>
 
     </div>
 

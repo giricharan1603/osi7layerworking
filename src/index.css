@@ -72,3 +72,121 @@ code {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* Responsive Dashboard Layout System */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.workspace-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sidebar-panel {
+  width: 320px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.main-content-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 14px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.bottom-stack-row {
+  display: flex;
+  gap: 16px;
+  min-height: 140px;
+}
+
+.decrypt-box {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.mobile-nav-bar {
+  display: none;
+}
+
+.canvas-card-wrapper {
+  flex: 1;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile & Tablet Optimizations (< 900px) */
+@media (max-width: 900px) {
+  .dashboard-container {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .workspace-layout {
+    flex-direction: column;
+    overflow: visible;
+    flex: none;
+  }
+
+  .sidebar-panel {
+    width: 100% !important;
+    border-right: none !important;
+    overflow: visible;
+  }
+
+  .main-content-panel {
+    padding: 10px;
+    gap: 10px;
+    overflow: visible;
+    flex: none;
+  }
+
+  .bottom-stack-row {
+    flex-direction: column;
+    gap: 10px;
+    min-height: auto;
+  }
+
+  .decrypt-box {
+    width: 100% !important;
+  }
+
+  .mobile-nav-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .canvas-card-wrapper {
+    min-height: 250px;
+  }
+
+  /* When on specific mobile tabs, conditionally show/hide components */
+  .mobile-hide-controls .sidebar-panel {
+    display: none !important;
+  }
+
+  .mobile-hide-canvas .canvas-section-group {
+    display: none !important;
+  }
+
+  .mobile-hide-logs .logs-section-group {
+    display: none !important;
+  }
+}
+

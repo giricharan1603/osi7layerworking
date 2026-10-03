@@ -460,7 +460,7 @@ export default function NetworkCanvas({
       }}>
         
         {/* Direct Graph Mode Switch Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
           <span style={{ color: '#aaa', fontWeight: 'bold' }}>Topology View:</span>
           <button
             onClick={() => setShowBroadcast && setShowBroadcast(false)}
