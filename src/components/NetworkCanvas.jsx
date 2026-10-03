@@ -311,11 +311,11 @@ export default function NetworkCanvas({
             ctx.restore();
 
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 9px sans-serif';
+            ctx.font = 'bold 9px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(
-              isCorrupted ? `F#${packet.id} ❌` : `F#${packet.id} 🌐`,
+              isCorrupted ? `F#${packet.id} [ERR]` : `F#${packet.id}`,
               px,
               py
             );
@@ -377,11 +377,11 @@ export default function NetworkCanvas({
           ctx.restore();
 
           ctx.fillStyle = '#fff';
-          ctx.font = 'bold 9px sans-serif';
+          ctx.font = 'bold 9px monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(
-            isCorrupted ? `F#${packet.id} ❌` : `F#${packet.id}`,
+            isCorrupted ? `F#${packet.id} [ERR]` : `F#${packet.id}`,
             packet.x,
             packet.y
           );
@@ -475,7 +475,7 @@ export default function NetworkCanvas({
               cursor: 'pointer'
             }}
           >
-            📍 Dijkstra Shortest Path
+            Dijkstra Shortest Path
           </button>
           <button
             onClick={() => setShowBroadcast && setShowBroadcast(true)}
@@ -490,7 +490,7 @@ export default function NetworkCanvas({
               cursor: 'pointer'
             }}
           >
-            🌐 Broadcast Tree (Spanning)
+            Spanning Broadcast Tree
           </button>
         </div>
 
@@ -550,8 +550,8 @@ export default function NetworkCanvas({
           pointerEvents: 'none'
         }}>
           {showBroadcast 
-            ? `🌐 Spanning Broadcast Tree (Root Node: ${startNode})` 
-            : `📍 Dijkstra Shortest Path: ${shortestPath.join(' ➔ ')}`}
+            ? `Spanning Broadcast Tree (Root Node: ${startNode})` 
+            : `Dijkstra Shortest Path: ${shortestPath.join(' -> ')}`}
         </div>
       </div>
 

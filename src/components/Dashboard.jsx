@@ -1,6 +1,19 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import NetworkCanvas from './NetworkCanvas';
 import ProtocolPanels from './ProtocolPanels';
+import { LegalModal } from './LegalModals';
+import { 
+  SunIcon, 
+  MoonIcon, 
+  AlertTriangleIcon, 
+  RefreshCwIcon, 
+  CheckIcon, 
+  ActivityIcon, 
+  PlayIcon, 
+  GitBranchIcon, 
+  CircleDotIcon, 
+  ClockIcon 
+} from './Icons';
 import { encryptData, decryptData } from '../utils/crypto';
 import { applyFraming, stripFraming } from '../utils/framing';
 import { findShortestPath, generateBroadcastTree } from '../utils/routing';
@@ -76,6 +89,7 @@ export default function Dashboard() {
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [receiverBuffer, setReceiverBuffer] = useState([]);
   const [finalOutput, setFinalOutput] = useState("");
+  const [legalModal, setLegalModal] = useState({ isOpen: false, type: 'privacy' });
 
   // Computed shortest path & broadcast tree using useMemo (no cascading renders)
   const shortestPath = useMemo(() => {
@@ -385,8 +399,8 @@ export default function Dashboard() {
         {/* Starting and Ending Positions Selector */}
         <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
           <label style={{ flex: 1, fontSize: '11px', color: isDarkMode ? '#ccc' : '#475569' }}>
-            <span style={{ fontWeight: 'bold', color: '#28a745' }}>
-              {showBroadcast ? "🟢 Root:" : "🟢 Start:"}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold', color: '#10b981' }}>
+              <CircleDotIcon size={9} color="#10b981" /> {showBroadcast ? "Root:" : "Start:"}
             </span>
             <select 
               value={startNode} 
@@ -411,8 +425,8 @@ export default function Dashboard() {
           </label>
 
           <label style={{ flex: 1, fontSize: '11px', color: isDarkMode ? '#ccc' : '#475569' }}>
-            <span style={{ fontWeight: 'bold', color: showBroadcast ? '#00f7ff' : '#dc3545' }}>
-              {showBroadcast ? "🌐 Target:" : "🔴 End:"}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold', color: showBroadcast ? '#00f7ff' : '#ef4444' }}>
+              <CircleDotIcon size={9} color={showBroadcast ? '#00f7ff' : '#ef4444'} /> {showBroadcast ? "Target:" : "End:"}
             </span>
             {showBroadcast ? (
               <div style={{ 
@@ -491,8 +505,9 @@ export default function Dashboard() {
               style={{ width: '14px', height: '14px', cursor: 'pointer', accentColor: '#dc3545' }}
             />
             <div>
-              <div style={{ fontSize: '11px', fontWeight: 'bold', color: simulateNoise ? '#ff7878' : (isDarkMode ? '#ddd' : '#1e293b') }}>
-                ⚡ Simulate Channel Noise
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 'bold', color: simulateNoise ? '#ff7878' : (isDarkMode ? '#ddd' : '#1e293b') }}>
+                <ActivityIcon size={12} color={simulateNoise ? '#ff7878' : (isDarkMode ? '#00f7ff' : '#0284c7')} />
+                <span>Simulate Channel Noise</span>
               </div>
               <div style={{ fontSize: '9px', color: isDarkMode ? '#888' : '#64748b' }}>
                 Injects CRC error to test Go-Back-N manual retransmission
@@ -510,17 +525,35 @@ export default function Dashboard() {
               borderRadius: '4px', 
               fontWeight: 'bold', 
               fontSize: '12px',
-              cursor: 'pointer' 
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
             }}
           >
-            {showBroadcast ? "🌐 Broadcast Across Spanning Tree" : "Execute Transmission Stream"}
+            <PlayIcon size={11} color="#fff" />
+            <span>{showBroadcast ? "Broadcast Across Spanning Tree" : "Execute Transmission Stream"}</span>
           </button>
 
           <button 
             onClick={() => handleToggleMode(!showBroadcast)} 
-            style={{ background: '#007bff', color: '#fff', border: 'none', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '11px' }}
+            style={{ 
+              background: '#007bff', 
+              color: '#fff', 
+              border: 'none', 
+              padding: '6px', 
+              borderRadius: '4px', 
+              cursor: 'pointer', 
+              fontSize: '11px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}
           >
-            {showBroadcast ? "View Dijkstra Shortest Path" : "Show Subnet Spanning Broadcast Tree"}
+            <GitBranchIcon size={12} color="#fff" />
+            <span>{showBroadcast ? "View Dijkstra Shortest Path" : "Show Subnet Spanning Broadcast Tree"}</span>
           </button>
         </div>
       </div>
@@ -545,32 +578,28 @@ export default function Dashboard() {
                 Base ACK: <strong style={{ color: '#28a745' }}>{baseAck}</strong> | Next Seq: <strong style={{ color: isDarkMode ? '#ffc107' : '#b45309' }}>{nextSeqNum}</strong>
               </span>
 
-              {/* Dark Mode Option at Right Side Top Corner */}
+              {/* Dark Mode Option at Right Side Top Corner - Clean rectangular shape with SVG icon */}
               <button
                 onClick={toggleTheme}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  background: isDarkMode 
-                    ? 'linear-gradient(135deg, #1f2937, #111827)' 
-                    : 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
+                  background: isDarkMode ? '#242a35' : '#f1f5f9',
                   color: isDarkMode ? '#00f7ff' : '#0f172a',
-                  border: isDarkMode ? '1px solid #00f7ff66' : '1px solid #94a3b8',
-                  padding: '4px 12px',
-                  borderRadius: '20px',
+                  border: isDarkMode ? '1px solid #334155' : '1px solid #cbd5e1',
+                  padding: '4px 10px',
+                  borderRadius: '4px',
                   fontSize: '11px',
                   fontWeight: 'bold',
                   cursor: 'pointer',
-                  boxShadow: isDarkMode 
-                    ? '0 0 10px rgba(0, 247, 255, 0.2)' 
-                    : '0 2px 4px rgba(0, 0, 0, 0.08)',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.15s ease',
                   userSelect: 'none'
                 }}
                 title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
               >
-                <span>{isDarkMode ? '🌙 Dark Mode' : '☀️ Light Mode'}</span>
+                {isDarkMode ? <MoonIcon size={12} color="#00f7ff" /> : <SunIcon size={12} color="#f59e0b" />}
+                <span>{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
               </button>
             </div>
           </div>
@@ -590,8 +619,9 @@ export default function Dashboard() {
               gap: '10px'
             }}>
               <div>
-                <div style={{ color: '#ff6666', fontWeight: 'bold', fontSize: '13px' }}>
-                  ⚠️ CRC Error on Frame F#{retransmittingInfo.failedId}!
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ff6666', fontWeight: 'bold', fontSize: '13px' }}>
+                  <AlertTriangleIcon size={15} color="#ff6666" />
+                  <span>CRC Error on Frame F#{retransmittingInfo.failedId}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: '#ccc', marginTop: '2px' }}>
                   {showBroadcast 
@@ -611,13 +641,13 @@ export default function Dashboard() {
                   fontWeight: 'bold',
                   fontSize: '12px',
                   cursor: 'pointer',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 0 10px rgba(40,167,69,0.5)'
+                  gap: '6px'
                 }}
               >
-                🔄 Retransmit From Frame F#{baseAck}
+                <RefreshCwIcon size={13} color="#fff" />
+                <span>Retransmit From Frame F#{baseAck}</span>
               </button>
             </div>
           )}
@@ -644,7 +674,11 @@ export default function Dashboard() {
                   gap: '6px'
                 }}>
                   <span>F#{f.id}</span>
-                  {isConfirmed && <span style={{ color: '#28a745' }}>✓</span>}
+                  {isConfirmed && (
+                    <span style={{ color: '#28a745', display: 'inline-flex', alignItems: 'center' }}>
+                      <CheckIcon size={11} color="#28a745" />
+                    </span>
+                  )}
                   {isCorrupted && <span style={{ color: '#ff6666', fontSize: '10px' }}>CRC ERR</span>}
                 </div>
               );
@@ -711,11 +745,15 @@ export default function Dashboard() {
                       padding: '2px 8px',
                       fontSize: '10px',
                       fontWeight: 'bold',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
                     }}
                     title="Click to retransmit unacknowledged frames starting from base ACK"
                   >
-                    🔄 Retransmit From Frame F#{baseAck}
+                    <RefreshCwIcon size={10} color="#fff" />
+                    <span>Retransmit F#{baseAck}</span>
                   </button>
                 )}
               </div>
@@ -736,7 +774,7 @@ export default function Dashboard() {
                     fontWeight: ackMode === 'auto' ? 'bold' : 'normal'
                   }}
                 >
-                  ⚡ Auto ACK
+                  Auto ACK
                 </button>
                 <button
                   onClick={() => toggleAckMode('manual')}
@@ -751,7 +789,7 @@ export default function Dashboard() {
                     fontWeight: ackMode === 'manual' ? 'bold' : 'normal'
                   }}
                 >
-                  ✋ Manual Approve
+                  Manual ACK
                 </button>
               </div>
             </div>
@@ -770,8 +808,9 @@ export default function Dashboard() {
                 flexWrap: 'wrap',
                 gap: '6px'
               }}>
-                <div style={{ fontSize: '11px', color: '#90caf9' }}>
-                  ⏳ <strong>{pendingApprovals.length}</strong> packet(s) arrived. Waiting for receiver manual approval:
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#90caf9' }}>
+                  <ClockIcon size={12} color="#90caf9" />
+                  <span><strong>{pendingApprovals.length}</strong> packet(s) awaiting approval:</span>
                 </div>
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   {pendingApprovals.map(p => (
@@ -786,10 +825,14 @@ export default function Dashboard() {
                         padding: '2px 6px',
                         fontSize: '10px',
                         fontWeight: 'bold',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px'
                       }}
                     >
-                      ✅ Approve F#{p.id}
+                      <CheckIcon size={10} color="#fff" />
+                      <span>Approve F#{p.id}</span>
                     </button>
                   ))}
                   {pendingApprovals.length > 1 && (
@@ -803,10 +846,14 @@ export default function Dashboard() {
                         padding: '2px 8px',
                         fontSize: '10px',
                         fontWeight: 'bold',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px'
                       }}
                     >
-                      ✅ Approve All
+                      <CheckIcon size={10} color="#fff" />
+                      <span>Approve All</span>
                     </button>
                   )}
                 </div>
@@ -913,14 +960,48 @@ export default function Dashboard() {
             />
           </div>
           <div style={{ color: '#8c94a0', fontSize: '11px' }}>
-            &copy; {new Date().getFullYear()} <strong style={{ color: '#ffffff' }}>KGC</strong> Brand. All rights reserved.
+            &copy; {new Date().getFullYear()} <strong style={{ color: isDarkMode ? '#ffffff' : '#0f172a' }}>KGC</strong> Brand. All rights reserved.
           </div>
+          
+          {/* Legal Compliance Links */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '11px' }}>
+            <button
+              onClick={() => setLegalModal({ isOpen: true, type: 'privacy' })}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: isDarkMode ? '#00f7ff' : '#0284c7',
+                cursor: 'pointer',
+                padding: '2px 4px',
+                fontSize: '11px',
+                textDecoration: 'underline'
+              }}
+            >
+              Privacy Policy
+            </button>
+            <span style={{ color: isDarkMode ? '#444' : '#cbd5e1' }}>|</span>
+            <button
+              onClick={() => setLegalModal({ isOpen: true, type: 'terms' })}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: isDarkMode ? '#00f7ff' : '#0284c7',
+                cursor: 'pointer',
+                padding: '2px 4px',
+                fontSize: '11px',
+                textDecoration: 'underline'
+              }}
+            >
+              Terms &amp; Conditions
+            </button>
+          </div>
+
           <div style={{
-            background: 'rgba(0, 247, 255, 0.1)',
-            border: '1px solid rgba(0, 247, 255, 0.3)',
-            color: '#00f7ff',
+            background: isDarkMode ? 'rgba(0, 247, 255, 0.1)' : 'rgba(2, 132, 199, 0.1)',
+            border: isDarkMode ? '1px solid rgba(0, 247, 255, 0.3)' : '1px solid rgba(2, 132, 199, 0.3)',
+            color: isDarkMode ? '#00f7ff' : '#0284c7',
             padding: '2px 8px',
-            borderRadius: '12px',
+            borderRadius: '4px',
             fontSize: '10px',
             fontWeight: 'bold',
             letterSpacing: '0.5px'
@@ -929,6 +1010,14 @@ export default function Dashboard() {
           </div>
         </div>
       </footer>
+
+      {/* Standalone Legal Compliance Modal */}
+      <LegalModal 
+        isOpen={legalModal.isOpen} 
+        type={legalModal.type} 
+        onClose={() => setLegalModal(prev => ({ ...prev, isOpen: false }))} 
+        isDarkMode={isDarkMode} 
+      />
     </div>
   );
 }
