@@ -338,8 +338,14 @@ export default function Dashboard() {
     <div 
       className={`dashboard-container ${mobileClass}`}
       style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
         background: isDarkMode ? '#121212' : '#f4f6f9',
-        color: isDarkMode ? '#e0e0e0' : '#1e293b'
+        color: isDarkMode ? '#e0e0e0' : '#1e293b',
+        fontFamily: 'Segoe UI, sans-serif',
+        overflow: 'hidden',
+        transition: 'background 0.25s ease, color 0.25s ease'
       }}
     >
       {/* Mobile Navigation Segmented Tab Bar (Visible on mobile screens <= 900px) */}
@@ -388,16 +394,27 @@ export default function Dashboard() {
       </div>
 
       {/* Main Workspace (Left Hub + Canvas & Panels) */}
-      <div className="workspace-layout">
+      <div 
+        className="workspace-layout"
+        style={{
+          display: 'flex',
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden'
+        }}
+      >
 
         {/* Left Configuration Control Hub Panel */}
         <div 
           className="sidebar-panel no-scrollbar"
           style={{
+            width: '320px',
             padding: '12px 14px',
             borderRight: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
             display: 'flex',
             flexDirection: 'column',
+            boxSizing: 'border-box',
+            overflowY: 'auto',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             background: isDarkMode ? '#16181d' : '#ffffff',
@@ -610,10 +627,21 @@ export default function Dashboard() {
       </div>
 
       {/* Main Graph Canvas and Logging Console Panels Workspace */}
-      <div className="main-content-panel">
+      <div 
+        className="main-content-panel"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '16px',
+          gap: '14px',
+          boxSizing: 'border-box',
+          overflowY: 'auto'
+        }}
+      >
         
         {/* Canvas Section Group */}
-        <div className="canvas-section-group" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="canvas-section-group">
 
           {/* Sliding Window Frame Queue Buffer Visualizer Header Row */}
           <div style={{
@@ -741,13 +769,20 @@ export default function Dashboard() {
         </div>
 
         {/* Network Layout Graph Visual Canvas */}
-        <div className="canvas-card-wrapper" style={{
-          background: isDarkMode ? '#1e1e1e' : '#ffffff',
-          borderRadius: '6px',
-          overflow: 'hidden',
-          border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
-          boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
-        }}>
+        <div 
+          className="canvas-card-wrapper" 
+          style={{
+            flex: 1,
+            minHeight: '340px',
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            borderRadius: '6px',
+            overflow: 'hidden',
+            border: isDarkMode ? '1px solid #2d2d2d' : '1px solid #e2e8f0',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: isDarkMode ? 'none' : '0 1px 4px rgba(0,0,0,0.06)'
+          }}
+        >
           <NetworkCanvas 
             activePackets={activePackets} 
             shortestPath={shortestPath} 
@@ -770,7 +805,14 @@ export default function Dashboard() {
         {/* Logs Section Group */}
         <div className="logs-section-group">
           {/* Bottom Destination Stack Frame Assembler Tracker Readout Console Logs */}
-          <div className="bottom-stack-row">
+          <div 
+            className="bottom-stack-row"
+            style={{
+              display: 'flex',
+              gap: '16px',
+              minHeight: '140px'
+            }}
+          >
           
           {/* Receiver Buffer with Manual/Auto Approve controls & Manual Retransmit */}
           <div style={{
@@ -943,6 +985,7 @@ export default function Dashboard() {
           <div 
             className="decrypt-box"
             style={{
+              width: '280px',
               background: isDarkMode ? '#1e1e1e' : '#ffffff',
               padding: '12px 16px',
               borderRadius: '6px',

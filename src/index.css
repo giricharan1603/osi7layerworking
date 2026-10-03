@@ -73,12 +73,13 @@ code {
   scrollbar-width: none !important;
 }
 
-/* Responsive Dashboard Layout System */
+/* Responsive Dashboard Layout System - Desktop (Default / min-width: 901px) */
 .dashboard-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   transition: background 0.25s ease, color 0.25s ease;
 }
 
@@ -92,8 +93,8 @@ code {
 .sidebar-panel {
   width: 320px;
   flex-shrink: 0;
-  overflow-y: auto;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .main-content-panel {
@@ -104,6 +105,20 @@ code {
   gap: 14px;
   box-sizing: border-box;
   overflow-y: auto;
+}
+
+/* On desktop (> 900px), canvas-section-group and logs-section-group are transparent wrappers
+   so children become direct flex items of main-content-panel, exactly preserving the previous desktop layout */
+.canvas-section-group,
+.logs-section-group {
+  display: contents !important;
+}
+
+.canvas-card-wrapper {
+  flex: 1;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
 }
 
 .bottom-stack-row {
@@ -118,47 +133,52 @@ code {
 }
 
 .mobile-nav-bar {
-  display: none;
+  display: none !important;
 }
 
-.canvas-card-wrapper {
-  flex: 1;
-  min-height: 340px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Mobile & Tablet Optimizations (< 900px) */
+/* Mobile & Tablet Optimizations (<= 900px) */
 @media (max-width: 900px) {
   .dashboard-container {
-    height: auto;
-    min-height: 100vh;
-    overflow-y: auto;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
   }
 
   .workspace-layout {
-    flex-direction: column;
-    overflow: visible;
-    flex: none;
+    flex-direction: column !important;
+    overflow: visible !important;
+    flex: none !important;
   }
 
   .sidebar-panel {
     width: 100% !important;
     border-right: none !important;
-    overflow: visible;
+    overflow: visible !important;
   }
 
   .main-content-panel {
-    padding: 10px;
-    gap: 10px;
-    overflow: visible;
-    flex: none;
+    padding: 10px !important;
+    gap: 10px !important;
+    overflow: visible !important;
+    flex: none !important;
+  }
+
+  .canvas-section-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .logs-section-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
   }
 
   .bottom-stack-row {
-    flex-direction: column;
-    gap: 10px;
-    min-height: auto;
+    flex-direction: column !important;
+    gap: 10px !important;
+    min-height: auto !important;
   }
 
   .decrypt-box {
@@ -166,14 +186,15 @@ code {
   }
 
   .mobile-nav-bar {
-    display: flex;
-    position: sticky;
-    top: 0;
-    z-index: 40;
+    display: flex !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
   }
 
   .canvas-card-wrapper {
-    min-height: 250px;
+    min-height: 250px !important;
+    flex: none !important;
   }
 
   /* When on specific mobile tabs, conditionally show/hide components */
